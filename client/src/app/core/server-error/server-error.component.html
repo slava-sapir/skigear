@@ -1,0 +1,21 @@
+<div class="container mt-5">
+    <ng-container *ngIf="error">
+        
+    <h4>Internal Server Error - refreshing the page will make message disappear</h4>
+    <h5 class="class text-danger">Error: {{error.message}}</h5>
+    <p class="font-weight-bold">Note: If you are seeing this then probably Angular not responsible!</p>
+    <p>What to do next?</p>
+    <ol>
+        <li>Open Chrome dev tools</li>
+        <li>Inspect network tabs</li>
+        <li>Check the failing request</li>
+        <li>Examine this requset URL - make sure this is correct</li>
+        <li>Reproduce this error in Postman, if you see the same response then 
+            its NOT an issue with Angular then </li>
+    </ol>
+    <p>Following is the stack trace - here you start you investigation</p>
+    <code class="mt-5" style="background-color: whitesmoke;">{{error.details}}</code>
+
+    </ng-container>
+    
+</div>
