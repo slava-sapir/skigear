@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
   title = 'SkiGear';
 
   constructor(private basketService: BasketService,
-              private accountServie: AccountService) {}
+              private accountService: AccountService) {}
 
   ngOnInit(): void {
     this.loadBasket();
@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
    loadCurrentUser() {
 
     const token = localStorage.getItem('token');
-    this.accountServie.loadCurrentUser(token).subscribe( () => {
+    this.accountService.loadCurrentUser(token).subscribe( () => {
       console.log('Current user loaded');
     }, error => {
       console.log(error);
