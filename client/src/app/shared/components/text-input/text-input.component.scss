@@ -1,5 +1,5 @@
 .form-label-group {
-    position: relative;
+   position: relative;
     margin-bottom: 1rem;
   }
   
@@ -10,8 +10,8 @@
   
   .form-label-group > label {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 1px;
+    left: 5px;
     display: block;
     width: 100%;
     margin-bottom: 0; /* Override default `<label>` margin */
@@ -50,7 +50,7 @@
   .form-label-group input:not(:placeholder-shown) ~ label {
     padding-top: calc(var(--input-padding-y) / 3);
     padding-bottom: calc(var(--input-padding-y) / 3);
-    font-size: 12px;
+    font-size: 10px;
     color: #777;
   }
   

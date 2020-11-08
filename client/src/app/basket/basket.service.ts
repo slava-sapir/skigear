@@ -1,3 +1,4 @@
+import { IDeliveryMethod } from './../shared/models/deliveryMethod';
 import { Basket, IBasket, IBasketItem, IBasketTotals } from '../shared/models/basket';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -17,8 +18,20 @@ export class BasketService {
 
   private basketTotal = new BehaviorSubject<IBasketTotals>(null);
   basketTotal$ = this.basketTotal.asObservable();
+  shipping = 0;
 
   constructor(private http: HttpClient) { }
+
+  deleteLocalBasket(id: string) {
+    this.basketSource.next(null);
+    this.basketTotal.next(null);
+    localStorage.removeItem('basket_Id');
+  }
+
+  setShippingPrice(deliveryMethod: IDeliveryMethod) {
+    this.shipping = deliveryMethod.price;
+    this.calculateBasketTotal();
+  }
 
   getBasket(id: string) {
     return this.http.get(this.baseUrl + 'basket?id=' + id)
@@ -77,7 +90,7 @@ export class BasketService {
    return  this.http.delete(this.baseUrl + 'basket?id=' + basket.id).subscribe( () => {
      this.basketSource.next(null);
      this.basketTotal.next(null);
-     localStorage.removeItem('basketId');
+     localStorage.removeItem('basket_Id');
    }, error => {
       console.log(error);
    });
@@ -85,7 +98,7 @@ export class BasketService {
 
   calculateBasketTotal() {
     const basket = this.getCurrentBasketValue();
-    const shipping = 0;
+    const shipping = this.shipping;
     const subtotal = basket.items.reduce((a, b) => (b.price * b.quantity) + a, 0);
     const total = subtotal + shipping;
     this.basketTotal.next({shipping, total, subtotal});
@@ -98,8 +111,8 @@ export class BasketService {
       this.setBasket(basket);
   }
 
-  private addOrUpdateItem(items: IBasketItem[], itemToAdd: IBasketItem, quantity: number): IBasketItem[] {
-    const index = items.findIndex( i =>  i.id === itemToAdd.id );
+  private addOrUpdateItem(items: IBasketItem[], itemToAdd: IBasketItem, quantity: number): IBasketItem[] 
+   {const index = items.findIndex( i =>  i.id === itemToAdd.id );
     if ( index === -1) {
       itemToAdd.quantity = quantity;
       items.push(itemToAdd);
