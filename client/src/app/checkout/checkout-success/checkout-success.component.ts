@@ -14,9 +14,10 @@ export class CheckoutSuccessComponent implements OnInit {
   constructor(private router: Router) { 
     const navigation = this.router.getCurrentNavigation();
     const state = navigation && navigation.extras && navigation.extras.state;
+  
     if (state) {
       this.order = state as IOrder;
-    }
+     }
   }
 
   ngOnInit(): void {

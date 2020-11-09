@@ -17,15 +17,17 @@ export class AppComponent implements OnInit {
               private accountService: AccountService) {}
 
   ngOnInit(): void {
-    this.loadBasket();
     this.loadCurrentUser();
+    this.loadBasket();
    }
 
    loadCurrentUser() {
 
     const token = localStorage.getItem('token');
-    this.accountService.loadCurrentUser(token).subscribe( () => {
-      console.log('Current user loaded');
+    
+    this.accountService.loadCurrentUser(token).subscribe( (user) => {
+      if(user === null) { console.log('No curent user loaded')} 
+       else  console.log('Current user loaded');
     }, error => {
       console.log(error);
     });
