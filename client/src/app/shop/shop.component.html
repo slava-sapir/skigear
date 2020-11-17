@@ -12,7 +12,7 @@
             </select>
             <h5 class="text-warning ml-3">Brands</h5>
             <ul class="list-group my-3">
-                <li class="list-group-item" *ngFor="let brand of brands"
+                <li class="list-group-item" style="cursor: pointer;" *ngFor="let brand of brands"
                 [class.active]="brand.id === shopParams.brandId"
                 [value]="brand.id"
                 (click)="onBrandSelected(brand.id)">
@@ -21,7 +21,7 @@
             </ul>
             <h5 class="text-warning ml-3">Types</h5>
             <ul class="list-group my-3">
-                <li class="list-group-item" *ngFor="let type of types"
+                <li class="list-group-item" style="cursor: pointer;" *ngFor="let type of types"
                 [class.active]="type.id === shopParams.typeId"
                 [value]="type.id"
                 (click)="onTypeSelected(type.id)">
@@ -41,7 +41,8 @@
                 </app-paging-header>
                 
                 <div class="form-inline mt-2" *ngIf="products">
-                <input (keyup.enter)="onSearch()" type="text" #search class="form-control mr-2" style="width: 300px;" placeholder="search">
+                <input (keyup.enter)="onSearch()" type="text" #search class="form-control mr-2" 
+                 style="width: 300px;" placeholder="search"/>
                 <button (click)="onSearch()" class="btn btn-outline-primary my-2">Search</button>
                 <button (click)="onReset()" class="btn btn-outline-success ml-2 my-2">Reset</button>
                 </div>
