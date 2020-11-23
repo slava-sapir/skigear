@@ -18,10 +18,10 @@
 </div>
 
 <div class="float none d-flex justify-content-between flex-column flex-lg-row pl-1 mb-5">
-    <button class="bnt btn-outline-primary" cdkStepperPrevious>
-        <i class="fa fa-angle-left"></i>Back to Address
+    <button class="btn btn-outline-primary" cdkStepperPrevious>
+        <i class="fa fa-angle-left"></i> Back to Address
     </button>
-    <button class="bnt btn-primary" cdkStepperNext>
-        Go to Review<i class="fa fa-angle-right"></i>
+    <button [disabled]="checkoutForm.get('deliveryForm').invalid" class="btn btn-primary" cdkStepperNext>
+        Go to Review <i class="fa fa-angle-right"></i>
     </button>
 </div>

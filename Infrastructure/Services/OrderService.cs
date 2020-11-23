@@ -13,9 +13,12 @@ namespace Infrastructure.Services
 
         private readonly IBasketRepository _basketRepo;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPaymentService _paymentService;
 
-        public OrderService(IBasketRepository basketRepo, IUnitOfWork unitOfWork)
+        public OrderService(IBasketRepository basketRepo, IUnitOfWork unitOfWork,
+        IPaymentService paymentService)
         {
+            _paymentService = paymentService;
             _unitOfWork = unitOfWork;
             _basketRepo = basketRepo;
 
@@ -26,25 +29,39 @@ namespace Infrastructure.Services
         {
             //get basket from basket repo
             var basket = await _basketRepo.GetBasketAsync(basketId);
+
             //get items from product repo
             var items = new List<OrderItem>();
             foreach (var item in basket.Items)
             {
-            var productItem = await _unitOfWork.Repository<Product>().GetByIdAsync(item.Id);
-            var itemOrdered = new ProductItemOrdered(productItem.Id, productItem.Name,
-            productItem.PictureUrl);
-            var orderItem = new OrderItem(itemOrdered, productItem.Price, item.Quantity);
-            items.Add(orderItem);
+                var productItem = await _unitOfWork.Repository<Product>().GetByIdAsync(item.Id);
+                var itemOrdered = new ProductItemOrdered(productItem.Id, productItem.Name,
+                productItem.PictureUrl);
+                var orderItem = new OrderItem(itemOrdered, productItem.Price, item.Quantity);
+                items.Add(orderItem);
 
             }
+
             //get delivery method from repo
             var deliveryMethod = await _unitOfWork.Repository<DeliveryMethod>()
             .GetByIdAsync(deliveryMethodId);
+
             //calc subtotal
             var subtotal = items.Sum(item => item.Price * item.Quantity);
-            //create order
-            var order = new Order(items, shippingAddress, buyerEmail, deliveryMethod, subtotal);
 
+            //check the order exist
+            var spec = new OrderByPaymentIntentIdWithItemsSpecification(basket.PaymentIntentId);
+            var existingOrder = await _unitOfWork.Repository<Order>().GetEntityWithSpec(spec);
+
+            if (existingOrder != null)
+            {
+                _unitOfWork.Repository<Order>().Delete(existingOrder);
+                await _paymentService.CreateOrUpdatePaymentIntent(basket.PaymentIntentId);
+            }
+
+            //create order
+            var order = new Order(items, shippingAddress, buyerEmail,
+                                  deliveryMethod, subtotal, basket.PaymentIntentId);
             _unitOfWork.Repository<Order>().Add(order);
 
             //save order to db
@@ -53,7 +70,7 @@ namespace Infrastructure.Services
             if (result <= 0) return null;
 
             //delete basket from the redis-memory
-            await _basketRepo.DeleteBasketAsync(basketId);
+           // await _basketRepo.DeleteBasketAsync(basketId);
 
             //return order
             return order;
@@ -73,7 +90,7 @@ namespace Infrastructure.Services
         public async Task<IReadOnlyList<Order>> GetOrdersForUserAsync(string buyerEmail)
         {
             var spec = new OrdersWithItemsAndOrderingSpecification(buyerEmail);
-            return  await _unitOfWork.Repository<Order>().ListAsync(spec);
+            return await _unitOfWork.Repository<Order>().ListAsync(spec);
         }
     }
 }

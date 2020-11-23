@@ -31,10 +31,10 @@
 </div>
 
 <div class="float-none d-flex justify-content-between flex-column flex-lg-row mb-5">
-    <button class="bnt btn-outline-primary" routerLink="/basket">
-        <i class="fa fa-angle-left"></i>Back to Basket
+    <button class="btn btn-outline-primary" routerLink="/basket">
+        <i class="fa fa-angle-left"></i> Back to Basket
     </button>
-    <button class="bnt btn-primary" cdkStepperNext>
-        Go to Delivery<i class="fa fa-angle-right"></i>
+    <button [disabled]="checkoutForm.get('addressForm').invalid" class="btn btn-primary" cdkStepperNext>
+        Go to Delivery <i class="fa fa-angle-right"></i>
     </button>
 </div>

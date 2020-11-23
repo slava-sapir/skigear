@@ -22,6 +22,18 @@ export class BasketService {
 
   constructor(private http: HttpClient) { }
 
+  createPaymentIntent() {
+    return this.http.post(this.baseUrl + 'payment/' + this.getCurrentBasketValue().id, {})
+    .pipe(
+      map(
+        (basket: IBasket) => {
+           this.basketSource.next(basket);
+           console.log(this.getCurrentBasketValue());
+        }
+      )
+    );
+  }
+
   deleteLocalBasket(id: string) {
     this.basketSource.next(null);
     this.basketTotal.next(null);
@@ -30,7 +42,11 @@ export class BasketService {
 
   setShippingPrice(deliveryMethod: IDeliveryMethod) {
     this.shipping = deliveryMethod.price;
+    const basket = this.getCurrentBasketValue();
+    basket.deliveryMethodId = deliveryMethod.id;
+    basket.shippingPrice = deliveryMethod.price;
     this.calculateBasketTotal();
+    this.setBasket(basket);
   }
 
   getBasket(id: string) {
@@ -38,6 +54,7 @@ export class BasketService {
     .pipe(
       map( (basket: IBasket) => {
            this.basketSource.next(basket);
+           this.shipping = basket.shippingPrice;
            this.calculateBasketTotal();
       })
     );
@@ -98,7 +115,7 @@ export class BasketService {
 
   calculateBasketTotal() {
     const basket = this.getCurrentBasketValue();
-    const shipping = this.shipping;
+    const shipping = basket.shippingPrice;
     const subtotal = basket.items.reduce((a, b) => (b.price * b.quantity) + a, 0);
     const total = subtotal + shipping;
     this.basketTotal.next({shipping, total, subtotal});
@@ -111,14 +128,15 @@ export class BasketService {
       this.setBasket(basket);
   }
 
-  private addOrUpdateItem(items: IBasketItem[], itemToAdd: IBasketItem, quantity: number): IBasketItem[] 
-   {const index = items.findIndex( i =>  i.id === itemToAdd.id );
+  private addOrUpdateItem(items: IBasketItem[], itemToAdd: IBasketItem, quantity: number): IBasketItem[]
+   {
+    const index = items.findIndex( i =>  i.id === itemToAdd.id );
     if ( index === -1) {
-      itemToAdd.quantity = quantity;
-      items.push(itemToAdd);
-    } else {
-      items[index].quantity += quantity;
-    }
+            itemToAdd.quantity = quantity;
+            items.push(itemToAdd);
+          } else {
+            items[index].quantity += quantity;
+          }
     return items;
   }
 
